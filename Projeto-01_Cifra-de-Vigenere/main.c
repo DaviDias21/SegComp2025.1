@@ -60,6 +60,7 @@ int main()
     char lc_plainTextMessage[500];
 
     char vigenereKey[20];
+    char lc_vigenereKey[20];
     int keySize;
     int keyIndex = 0;
 
@@ -79,7 +80,7 @@ int main()
     fscanf(inputFilePointer, "%[^\n]", plainTextMessage);
 
     //Sets the plaintext to lowercase, for future character frequency analysis
-    for(int i=0;i<strlen(plainTextMessage);i++)
+    for(int i = 0; i < strlen(plainTextMessage); i++)
     {
         lc_plainTextMessage[i] = tolower(plainTextMessage[i]);
     }
@@ -90,10 +91,17 @@ int main()
     scanf("%[^\n]", vigenereKey);
     keySize = strlen(vigenereKey);
 
+    //Sets the inputted key to lowercase, to avoid errors
+    for(int i = 0; i < keySize; i++)
+    {
+        lc_vigenereKey[i] = tolower(vigenereKey[i]);
+    }
+    lc_vigenereKey[keySize]='\0';
+
     //Ciphers plaintext (lowercase) one character at a time
     for(int j=0;j<strlen(lc_plainTextMessage);j++)
     {
-        cipherTextMessage[j] = generateCharFromVigenere(lc_plainTextMessage[j], vigenereKey[keyIndex]);
+        cipherTextMessage[j] = generateCharFromVigenere(lc_plainTextMessage[j], lc_vigenereKey[keyIndex]);
         //Key wrap-around
         if(keyIndex + 1 >= keySize){keyIndex = 0;}
         else{keyIndex++;}

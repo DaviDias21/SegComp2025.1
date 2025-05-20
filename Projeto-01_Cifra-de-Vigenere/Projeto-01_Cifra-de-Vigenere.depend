@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1747686683 source:c:\documents\c\projects\segcomp2025.1\projeto-01_cifra-de-vigenere\main.c
+1747708316 source:c:\documents\c\projects\segcomp2025.1\projeto-01_cifra-de-vigenere\main.c
 	<stdio.h>
 	<stdlib.h>
 	<string.h>
