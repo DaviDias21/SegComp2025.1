@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <stdlib.h>
+#include <ctype.h>
 
 #define MAXTXT 500
 
@@ -10,11 +11,13 @@ void displayFrequency();
 
 void keyletters();
 void printFrequency();
+void findFrequency();
 
 int main(){
 
     char cipherTextMessage[MAXTXT];
-    float frequency_list[26] = {14.6, 1.0, 3.9, 5.0, 12.6, 1.0, 1.3, 1.3, 6.2, 0.4, 0.0, 2.8, 4.7, 5.0, 10.7, 2.5, 1.2, 6.5, 7.8, 4.3, 4.6, 1.7, 0.0, 0.2, 0.0, 0.5};
+    float pt_frequency_list[26] = {14.6, 1.0, 3.9, 5.0, 12.6, 1.0, 1.3, 1.3, 6.2, 0.4, 0.0, 2.8, 4.7, 5.0, 10.7, 2.5, 1.2, 6.5, 7.8, 4.3, 4.6, 1.7, 0.0, 0.2, 0.0, 0.5};
+    float en_frequency_list[26] = {8.2, 1.5, 2.8, 4.3, 12.7, 2.2, 2.0, 6.1, 7.0, 0.2, 0.8, 4.0, 2.4, 6.7, 7.5, 1.9, 0.1, 6.0, 6.3, 9.1, 2.8, 1.0, 2.4, 0.2, 2.0, 0.1};
 
     FILE *inputFilePointer;
     char inputFileName[] = "ciphertext.txt";
@@ -29,7 +32,15 @@ int main(){
 
 
     int key_size = keysize(cipherTextMessage);
-    keyletters(cipherTextMessage, frequency_list, key_size);
+
+    printf("Choose language: [p, e] ");
+    char language;
+    scanf(" %c", &language);
+    if(language == 'p'){
+        keyletters(cipherTextMessage, pt_frequency_list, key_size);
+    } else if(language == 'e'){
+        keyletters(cipherTextMessage, en_frequency_list, key_size);
+    }
     
     exit(0);
     return 0;
@@ -111,6 +122,8 @@ void displayFrequency(int cgroup[3], int d){
 
 void keyletters(char cText[MAXTXT], float fList[26], int keySize){
 
+    float cipher_text_frequency[26];
+
     char key[20];
     for(int i=0; i<20; i++){
         key[i] = '_';
@@ -119,6 +132,7 @@ void keyletters(char cText[MAXTXT], float fList[26], int keySize){
 
     int cur_shift = 0;
     int cur_key = 0;
+    findFrequency(cText, cipher_text_frequency, keySize, cur_key);
     while(key[keySize-1] == '_'){
         printf("\nCIPHER KEY\n");
         for(int i=0; i<keySize; i++){
@@ -127,7 +141,7 @@ void keyletters(char cText[MAXTXT], float fList[26], int keySize){
         printf("\n\nLETTER FREQUENCY\n");
         printFrequency(fList, 0);
         printf("\n\nCIPHER LETTER FREQUENCY\n");
-        printFrequency(fList, cur_shift);
+        printFrequency(cipher_text_frequency, cur_shift);
         printf("\n'a' para mover para a esquerda. 'd' para mover para a direita. 'k' para confirmar.\n");
         char shift;
         scanf(" %c", &shift);
@@ -138,6 +152,7 @@ void keyletters(char cText[MAXTXT], float fList[26], int keySize){
         } else if(shift=='k'){
             key[cur_key++] = letters[cur_shift];
             cur_shift = 0;
+            findFrequency(cText, cipher_text_frequency, keySize, cur_key);
         }
         if(cur_shift==26){
             cur_shift = 0;
@@ -175,5 +190,29 @@ void printFrequency(float frequency[26], int start){
     }
     for(int i=0; i<start; i++){
         printf("%4.1f ", frequency[i]);
+    }
+}
+
+void findFrequency(char cText[MAXTXT], float cFrequency[26], int keySize, int keyIndex){
+    int counter = 0;
+    while(cText[counter] != '\0'){
+        counter++;
+    }
+    for(int i=0; i<26; i++){
+        cFrequency[i] = 0;
+    }
+    while(keyIndex < counter){
+        if(isalpha(cText[keyIndex])){
+            cFrequency[tolower(cText[keyIndex]) - 'a'] += 1;
+        }
+        keyIndex += keySize;
+    }
+    int total = 0;
+    for(int i=0; i<26; i++){
+        total += cFrequency[i];
+    }
+    for(int i=0; i<26; i++){
+        cFrequency[i] *= 100;
+        cFrequency[i] /= total;
     }
 }
