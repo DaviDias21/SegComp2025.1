@@ -17,7 +17,7 @@ int main(){
     float frequency_list[26] = {14.6, 1.0, 3.9, 5.0, 12.6, 1.0, 1.3, 1.3, 6.2, 0.4, 0.0, 2.8, 4.7, 5.0, 10.7, 2.5, 1.2, 6.5, 7.8, 4.3, 4.6, 1.7, 0.0, 0.2, 0.0, 0.5};
 
     FILE *inputFilePointer;
-    char inputFileName[] = "input.txt";
+    char inputFileName[] = "ciphertext.txt";
     inputFilePointer = fopen(inputFileName, "r");
 
     if(inputFilePointer==NULL)
@@ -43,8 +43,8 @@ int keysize(char ctext[MAXTXT]){
     bool end_reached = false;
     int is_repeated = 0;
 
-    printf("POSSIBLE KEYSIZE\n");
-    printf("----------------\n");
+    printf("POSSIBLE KEYSIZES\n");
+    printf("-----------------\n");
     printf("|| Repeated Sequence || Spacing || 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 |\n");
     /* 22 | 12 | 4 */
 
@@ -72,6 +72,11 @@ int keysize(char ctext[MAXTXT]){
         }
         ++index;
     }
+
+    int key;
+    printf("Selecione o tamanho da senha: ");
+    scanf("%d", &key);
+    return key;
 }
 
 int isRepeated(int pgroup[MAXTXT][3], int cgroup[3], int i){
@@ -106,24 +111,44 @@ void displayFrequency(int cgroup[3], int d){
 
 void keyletters(char cText[MAXTXT], float fList[26], int keySize){
 
-    printf("LETTER FREQUENCY\n");
-    printFrequency(fList, 0);
+    char key[20];
+    for(int i=0; i<20; i++){
+        key[i] = '_';
+    }
+    char letters[26] = {'A', 'Z', 'Y', 'X', 'W', 'V', 'U', 'T', 'S', 'R', 'Q', 'P', 'O', 'N', 'M', 'L', 'K', 'J', 'I', 'H', 'G', 'F', 'E', 'D', 'C', 'B'};
 
     int cur_shift = 0;
-    while(true){
+    int cur_key = 0;
+    while(key[keySize-1] == '_'){
+        printf("\nCIPHER KEY\n");
+        for(int i=0; i<keySize; i++){
+            printf(" %c ", key[i]);
+        }
+        printf("\n\nLETTER FREQUENCY\n");
+        printFrequency(fList, 0);
+        printf("\n\nCIPHER LETTER FREQUENCY\n");
+        printFrequency(fList, cur_shift);
+        printf("\n'a' para mover para a esquerda. 'd' para mover para a direita. 'k' para confirmar.\n");
         char shift;
-        scanf("%c", &shift);
+        scanf(" %c", &shift);
         if(shift=='a'){
             cur_shift++;
         } else if(shift=='d'){
             cur_shift--;
+        } else if(shift=='k'){
+            key[cur_key++] = letters[cur_shift];
+            cur_shift = 0;
         }
         if(cur_shift==26){
             cur_shift = 0;
         } else if(cur_shift==-1){
             cur_shift = 25;
         }
-        printFrequency(fList, cur_shift);
+    }
+
+    printf("Chave da Cifra: ");
+    for(int i=0; i<keySize; i++){
+        printf("%c", key[i]);
     }
 }
 
