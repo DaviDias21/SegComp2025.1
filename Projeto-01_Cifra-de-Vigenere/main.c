@@ -4,13 +4,14 @@
 #include <stdbool.h>
 #include <ctype.h>
 #include <conio.h>
+#include "encrypt.h"
+#include "attack.h"
 
 #define MAXTXT 500
 #define MAXKEYSIZE 20
 
 bool userIsDone = false;
 
-char alphabet[26] = "abcdefghijklmnopqrstuvwxyz";
 char guessedPlaintextMessage[MAXTXT];
 
 FILE *plainTextFilePointer;
@@ -27,13 +28,6 @@ int keyIndex = 0;
 
 char cipherTextMessage[MAXTXT];
 
-int keysize();
-int isRepeated();
-void displayFrequency();
-
-void keyletters();
-void printFrequency();
-void findFrequency();
 bool isUserSatisfied = false;
 
 //Array with most used letters in Brazilian Portuguese for reference
@@ -41,69 +35,8 @@ float pt_frequency_list[26] = {14.6, 1.0, 3.9, 5.0, 12.6, 1.0, 1.3, 1.3, 6.2, 0.
 //Array with most used letters in English for reference
 float en_frequency_list[26] = {8.2, 1.5, 2.8, 4.3, 12.7, 2.2, 2.0, 6.1, 7.0, 0.2, 0.8, 4.0, 2.4, 6.7, 7.5, 1.9, 0.1, 6.0, 6.3, 9.1, 2.8, 1.0, 2.4, 0.2, 2.0, 0.1};
 
-/*In the Vigenere chart linked in the project requirements,
-the 'a' character shifts a plaintext character by a factor of 0,
-while the 'z' character shifts a plaintext character by a factor of 25,
-so we will consider a character's position in the alphabet its index in the alphabet string
-(Instead of using 1 to 26, we will use 0 to 25).*/
-//Finds a character's position in the alphabet
-int getNumberFromChar(char ch)
-{
-    int i=0;
-    while(ch != alphabet[i]){i++;}
-    return i;
-}
 
-//Finds a character from its position in the alphabet
-char getCharFromNumber(int num)
-{
-    return alphabet[num];
-}
-
-//Checks if a character is in the alphabet string
-bool isCharInTheAlphabet(char ch)
-{
-    bool isChar = false;
-    for(int i=0;i<strlen(alphabet);i++)
-    {
-        if(alphabet[i] == ch){isChar = true;}
-    }
-    return isChar;
-}
-
-/*If a character is in the alphabet string, calculates and returns Vigenere of that character.
-If the character is NOT in the alphabet, returns character as is. This maintains apostrophes, spaces, punctuation, etc.
-in the same positions as in the plaintext.*/
-char generateCharFromVigenere(char plainTextChar, char keyChar)
-{
-    char resultChar;
-    if(isCharInTheAlphabet(plainTextChar))
-    {
-        resultChar = getCharFromNumber(((getNumberFromChar(plainTextChar) + getNumberFromChar(keyChar)) + 26) % (26));
-    }
-    else
-    {
-        resultChar = plainTextChar;
-    }
-    return resultChar;
-}
-
-char reverseGenerateCharFromVigenere(char cipherTextChar, char possibleKeyChar)
-{
-    char resultChar_;
-    if(isCharInTheAlphabet(cipherTextChar))
-    {
-        resultChar_ = getCharFromNumber(((getNumberFromChar(cipherTextChar) - getNumberFromChar(possibleKeyChar)) + 26) % (26));
-    }
-    else
-    {
-        resultChar_ = cipherTextChar;
-    }
-    return resultChar_;
-}
-
-void vigenere()
-{
+void vigenere(){
     system("cls");
     printf("You are now encrypting.\n\n");
     //Takes plaintext from text file
@@ -166,10 +99,9 @@ void vigenere()
     }
 }
 
-void reverseVigenere(char cipherText[MAXTXT], char possibleKey[MAXKEYSIZE], int guessedKeySize_)
-{
+void reverseVigenere(char cipherText[MAXTXT], char possibleKey[MAXKEYSIZE], int guessedKeySize_){
     int keyIndex_ = 0;
-    printf("\nPossible plaintext from key:\n");
+    printf("\nPossible plaintext from key:\n\n");
     for(int j=0;j<strlen(cipherText);j++)
     {
         guessedPlaintextMessage[j] = reverseGenerateCharFromVigenere(cipherText[j], tolower(possibleKey[keyIndex_]));
@@ -180,81 +112,7 @@ void reverseVigenere(char cipherText[MAXTXT], char possibleKey[MAXKEYSIZE], int 
     }
     guessedPlaintextMessage[strlen(cipherText)]='\0';
 
-    printf("\n");
-}
-
-int keysize(char ctext[MAXTXT]){
-
-    int prev_group[MAXTXT][3];
-    int cur_group[3];
-    int index = 0;
-    bool end_reached = false;
-    int is_repeated = 0;
-
-    printf("POSSIBLE KEYSIZES\n");
-    printf("-----------------\n");
-    printf("|| Repeated Sequence || Spacing || 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 |\n");
-    /* 22 | 12 | 4 */
-
-    while(true){
-        bool has_space = false;
-        for(int i=0; i<3; i++){
-            cur_group[i] = ctext[index+i];
-            if(cur_group[i] == ' ' || cur_group[i] == '\n' || cur_group[i] == '\t'){
-                has_space = true;
-            }
-        }
-        if(cur_group[2] == '\0'){
-            break;
-        }
-        if(has_space){
-            ++index;
-            continue;
-        }
-        is_repeated = isRepeated(prev_group, cur_group, index);
-        if(is_repeated){
-            displayFrequency(cur_group, is_repeated);;
-        }
-        for(int i=0; i<3; i++){
-            prev_group[index][i] = cur_group[i];
-        }
-        ++index;
-    }
-
-    int key;
-    printf("Input key size guess: ");
-    scanf(" %d", &key);
-    return key;
-}
-
-int isRepeated(int pgroup[MAXTXT][3], int cgroup[3], int i){
-    int repeated_index = -1;
-    for(int u=0; u<i; u++){
-        bool is_same = true;
-        for(int j=0; j<3; j++){
-            if (pgroup[u][j] != cgroup[j]){
-                is_same = false;
-            }
-        }
-        if(is_same){
-            repeated_index = u;
-        }
-    }
-    if(repeated_index >= 0){
-        return i-repeated_index;
-    }
-    return 0;
-}
-
-char x(int distance, int num){
-        if(distance%num == 0){
-            return 'x';
-        }
-        return ' ';
-    }
-
-void displayFrequency(int cgroup[3], int d){
-    printf("%11c%c%c%16d%7c%4c%4c%4c%4c%4c%4c%4c%5c%5c%5c%5c%5c%5c%5c%5c%5c%5c%5c\n", cgroup[0], cgroup[1], cgroup[2], d, x(d, 2), x(d, 3), x(d, 4), x(d, 5), x(d, 6), x(d, 7), x(d, 8), x(d, 9), x(d, 10), x(d, 11), x(d, 12), x(d, 13), x(d, 14), x(d, 15), x(d, 16), x(d, 17), x(d, 18), x(d, 19), x(d, 20));
+    printf("\n\n");
 }
 
 void keyletters(char cText[MAXTXT], float fList[26], int guessedKeySize){
@@ -276,7 +134,6 @@ void keyletters(char cText[MAXTXT], float fList[26], int guessedKeySize){
     /*Finds frequencies of characters in ciphertext,
     considering user's guess for how long the key is*/
     findFrequency(cText, cipher_text_frequency, guessedKeySize, cur_key);
-
 
     while(key[guessedKeySize-1] == '_'){
         system("cls");
@@ -326,77 +183,10 @@ void keyletters(char cText[MAXTXT], float fList[26], int guessedKeySize){
     for(int i=0; i<guessedKeySize; i++){
         printf("%c", key[i]);
     }
-
     reverseVigenere(cText, key, guessedKeySize);
 }
 
-/*Goes through expected frequency array,
-printing the frequencies in decreasing order*/
-void printFrequency(float frequency[26], int start){
-    for(int i=15; i>=0; i--){
-        for(int u=start; u<26; u++){
-            if (frequency[u] >= i){
-                printf(" --- ");
-            } else{
-                printf("     ");
-            }
-        }
-        for(int u=0; u<start; u++){
-            if (frequency[u] >= i){
-                printf(" --- ");
-            } else{
-                printf("     ");
-            }
-        }
-        printf("\n ");
-    }
-    for(int i=start; i<26; i++){
-        printf("%4.1f ", frequency[i]);
-    }
-    for(int i=0; i<start; i++){
-        printf("%4.1f ", frequency[i]);
-    }
-}
-
-void findFrequency(char cText[MAXTXT], float cFrequency[26], int keySize, int keyIndex){
-    int counter = 0;
-
-    /*Increments counter until it reaches the end of the ciphertext string, i.e.,
-      calculates the size of the ciphertext message*/
-    while(cText[counter] != '\0'){
-        counter++;
-    }
-
-    //Clears array with frequency of each character
-    for(int i=0; i<26; i++){
-        cFrequency[i] = 0;
-    }
-
-    /*Runs through ciphertext array starting at keyIndex,
-    skipping however many characters the user guessed the key size is,
-    and counts how many of each character in the alphabet it encounters,
-    putting them in the cFrequency array*/
-    while(keyIndex < counter){
-        if(isalpha(cText[keyIndex])){
-            cFrequency[tolower(cText[keyIndex]) - 'a'] += 1;
-        }
-        keyIndex += keySize;
-    }
-
-    //Counts how many characters it has gone through in loop of line 373
-    int total = 0;
-    for(int i=0; i<26; i++){
-        total += cFrequency[i];
-    }
-
-    //Substitutes character count in each cFrequency array element by it's percentage of total characters
-    for(int i=0; i<26; i++){
-        cFrequency[i] *= 100;
-        cFrequency[i] /= total;
-    }
-}
-void attack()
-{
+void attack(){
     while(!isUserSatisfied)
     {
         system("cls");
@@ -419,7 +209,7 @@ void attack()
         //Runs keysize function and saves value the user inputted (a guess to the true key size)
         int key_size = keysize(cipherTextMessage);
 
-        printf("Choose language: [p, e] ");
+        printf("Choose language:\n[Type 'p' for Portuguese,\nor 'e' for English,\nthen press ENTER]\n");
         char language;
         scanf(" %c", &language);
         if(language == 'p'){
@@ -427,7 +217,7 @@ void attack()
             } else if(language == 'e'){
                 keyletters(cipherTextMessage, en_frequency_list, key_size);
             }
-        printf("Are you satisfied with this result?\n[Type 'y' for YES or a different key for NO, then press ENTER]\n");
+        printf("Are you satisfied with this result?\n[Type 'y' for YES,\nor a different key for NO,\nthen press ENTER]\n");
         char userInput;
         scanf(" %c", &userInput);
         fclose(inputFilePointer);
@@ -438,8 +228,7 @@ void attack()
     }
 }
 
-int main()
-{
+int main(){
     while(!userIsDone)
     {
         system("cls");

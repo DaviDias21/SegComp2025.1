@@ -7,3 +7,17 @@
 	<ctype.h>
 	<conio.h>
 
+1748182029 source:c:\users\admin\documents\github\segcomp2025.1\projeto-01_cifra-de-vigenere\main.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<stdbool.h>
+	<ctype.h>
+	<conio.h>
+	"encrypt.h"
+	"attack.h"
+
+1748181567 c:\users\admin\documents\github\segcomp2025.1\projeto-01_cifra-de-vigenere\encrypt.h
+
+1748180666 c:\users\admin\documents\github\segcomp2025.1\projeto-01_cifra-de-vigenere\attack.h
+
