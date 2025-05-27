@@ -58,7 +58,7 @@ void findFrequency(char cText[MAXTXT], float cFrequency[26], int keySize, int ke
         keyIndex += keySize;
     }
 
-    //Counts how many characters it has gone through in loop of line 373
+    //Counts how many characters it has gone through in loop of line 54
     int total = 0;
     for(int i=0; i<26; i++){
         total += cFrequency[i];
