@@ -187,6 +187,7 @@ void keyletters(char cText[MAXTXT], float fList[26], int guessedKeySize){
 }
 
 void attack(){
+    isUserSatisfied=false;
     while(!isUserSatisfied)
     {
         system("cls");
