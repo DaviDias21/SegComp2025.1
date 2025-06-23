@@ -7,6 +7,9 @@
 *.obj
 *.elf
 
+# Environment files
+Projeto-02/.venv/
+
 # Linker output
 *.ilk
 *.map
