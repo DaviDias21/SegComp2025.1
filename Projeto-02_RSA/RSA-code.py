@@ -8,4 +8,13 @@ def hashFunction(plaintextMsg: str):
     messageHash.update(plaintextB64)
     print(messageHash.digest())
 
-hashFunction("plaintext")
+test = "message"
+print(test)
+msgBytes = test.encode()
+print(msgBytes)
+msgB64 = base64.b64encode(msgBytes)
+print(msgB64)
+msgBackBytes = base64.b64decode(msgB64)
+print(msgBackBytes)
+msgBackString = msgBackBytes.decode()
+print(msgBackString)
