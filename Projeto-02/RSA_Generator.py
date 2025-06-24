@@ -9,10 +9,22 @@ import random
 LIMIT = 128
 E = 65537
 
+class ExtendedMessage:
+    def __init__(self, encryptedOriginalMessage:str, digitalSignature:str):
+        self.encryptedOriginalMessage = encryptedOriginalMessage
+        self.digitalSignature = digitalSignature
+
 class KeySet:
     def __init__(self, publicKey: tuple, privateKey: tuple):
         self.publicKey = publicKey
         self.privateKey = privateKey
+
+def cipherMessage(originalMessage : str, keySet):
+    encryptedMessage = originalMessage**keyset.privateKey[0] % keyset.privateKey[1]
+    messageHash = hashFunction(originalMessage)
+    digitalSignature = messageHash**keySet.privateKey[0] % keySet.privateKey[1]
+    extMessage = ExtendedMessage(encryptedMessage, digitalSignature)
+    return extMessage
 
 def RSA_Generator():
     print("Generating RSA...")
@@ -47,7 +59,6 @@ originalMessage = "message"
 print("Plaintext: ", originalMessage)
 
 messageHash = hashFunction(originalMessage)
-
 digitalSignature = messageHash**keyset.publicKey[0] % keyset.publicKey[1]
 
 cipherText = originalMessage**keyset.publicKey[0] % keyset.publicKey[1]
