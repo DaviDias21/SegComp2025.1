@@ -143,14 +143,14 @@ def decipherMessage(extMessageRecieved : ExtendedMessage, keySet : KeySet):
     decryptedSignature = (decryptedSignatureInt).to_bytes(32, "big")
 
     if(HashComparison(cleanedDecryptedMessage, decryptedSignature)):
-        print("AUTHENTICITY CHECK: TRUE")
+        print("INTEGRITY CHECK: TRUE")
     else:
-        print("AUTHENTICITY CHECK: FALSE")
+        print("INTEGRITY CHECK: FALSE")
     return decryptedMessage
 
 usedKeyset = GenerateKeySet()
 
-originalMessage = "me"
+originalMessage = "Message"
 print("Original message: ", originalMessage)
 
 extendedMessage = cipherMessage(originalMessage, usedKeyset)
