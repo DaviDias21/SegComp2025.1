@@ -3,8 +3,8 @@ import hashlib
 import base64
 import random
 
-#LIMIT = 179769313486231590772930519078902473361797697894230657273430081157732675805500963132708477322407536021120113879871393357658789768814416622492847430639474124377767893424865485276302219601246094119453082952085005768838150682342462881473913110540827237163350510684586298239947245938479716304835356329624224137216
-LIMIT = 1024
+#LIMIT = 13407807929942597099574024998205846127479365820592393377723561443721764030073546976801874298166903427690031858186486050853753882811946569946433649006084095
+LIMIT = 115792089237316195423570985008687907853269984665640564039457584007913129639935
 E = 65537
 
 class ExtendedMessage:
@@ -60,6 +60,31 @@ def GenerateKeySet():
     print("'d' has been chosen: d = ", d)
     return KeySet(publicKey=(E, primesProduct), privateKey=(d, primesProduct))
 
+def squareAnd_Multiply(base, exponent, modulus):
+
+    result = 1
+    current_base = base
+
+    while exponent > 0:
+        if exponent % 2 == 1:
+            result = result * current_base
+            result %= modulus
+        
+        current_base = current_base * current_base
+        current_base %= modulus
+        
+        exponent //= 2
+
+    return result
+
+def applyKey(input, type, keySet: KeySet):
+    if type=="private":
+        #return (input**keySet.privateKey[0]) % keySet.privateKey[1]
+        return squareAnd_Multiply(input, keySet.privateKey[0], keySet.privateKey[1])
+    elif type=="public":
+        #return (input**keySet.publicKey[0]) % keySet.publicKey[1]
+        return squareAnd_Multiply(input, keySet.publicKey[0], keySet.publicKey[1])
+
 def MessageBytesToInt(someMessage : bytes):
     messageBytesToInt = int.from_bytes(someMessage)
     return messageBytesToInt
@@ -86,16 +111,17 @@ def cipherMessage(originalMessage : str, keySet : KeySet):
     print("Encrypting message...")
     messageInt = MessageBytesToInt(originalMessage.encode())
     print("\nMessage int: ", messageInt)
-    encryptedInt = ((messageInt)**keySet.privateKey[0]) % keySet.privateKey[1]
+    encryptedInt = applyKey(messageInt, "private", keySet)
     print("Encrypted message int: ", encryptedInt)
     print("\nParsing to Base64...")
-    encryptedMessageB64 = base64.b64encode((encryptedInt).to_bytes(8))
+    encryptedMessageB64 = base64.b64encode((encryptedInt).to_bytes(64))
     print("\nCalculating digital signature...")
     messageHash = GetMessageHash(originalMessage)
     print("\nMessage hash: ", messageHash)
-    digitalSignatureInt = ((int.from_bytes(messageHash))**keySet.privateKey[0]) % keySet.privateKey[1]
+    digitalSignatureInt = int.from_bytes(messageHash)
+    digitalSignatureInt = applyKey(int.from_bytes(messageHash), "private", keySet)
     print("DigSign int: ", digitalSignatureInt)
-    digitalSignatureB64 = base64.b64encode((digitalSignatureInt).to_bytes(16, "big"))
+    digitalSignatureB64 = base64.b64encode((digitalSignatureInt).to_bytes(64, "big"))
     print("DigSign B64: ", digitalSignatureB64)
     extMessageSent = ExtendedMessage(encryptedMessageB64, digitalSignatureB64)
     print("\n[SENT MESSAGE] Encrypted message (Base64): ", encryptedMessageB64)
@@ -109,12 +135,13 @@ def decipherMessage(extMessageRecieved : ExtendedMessage, keySet : KeySet):
     print("[RECIEVED MESSAGE] Digital signature (Base64): ", extMessageRecieved.digitalSignature)
 
     print("\nConverting from Base64 and decrypting...")
-    decryptedMessageInt = ((int.from_bytes(base64.b64decode(extMessageRecieved.encryptedMessage)))**keySet.publicKey[0]) % keySet.publicKey[1]
-    decryptedSignatureInt = (int.from_bytes(base64.b64decode(extMessageRecieved.digitalSignature)))
+    decryptedMessageInt = applyKey(int.from_bytes(base64.b64decode(extMessageRecieved.encryptedMessage)), "public", keySet)
+    decryptedSignatureInt = int.from_bytes(base64.b64decode(extMessageRecieved.digitalSignature))
     print("DigSign int: ", decryptedSignatureInt)
-    decryptedMessage = MessageBytesToString((decryptedMessageInt).to_bytes(8, "big"))
-    cleanedDecryptedMessage = decryptedMessage.rstrip('\x00')
-    decryptedSignature = (decryptedSignatureInt).to_bytes(16, "big")
+    decryptedSignatureInt = applyKey(decryptedSignatureInt, "public", keySet)
+    decryptedMessage = MessageBytesToString((decryptedMessageInt).to_bytes(64, "big"))
+    cleanedDecryptedMessage = decryptedMessage.strip('\x00')
+    decryptedSignature = (decryptedSignatureInt).to_bytes(32, "big")
 
     if(HashComparison(cleanedDecryptedMessage, decryptedSignature)):
         print("AUTHENTICITY CHECK: TRUE")
@@ -130,5 +157,3 @@ print("Original message: ", originalMessage)
 extendedMessage = cipherMessage(originalMessage, usedKeyset)
 decipheredMessage = decipherMessage(extendedMessage, usedKeyset)
 print("Original message: ", decipheredMessage)
-
-input()
