@@ -3,8 +3,7 @@ import hashlib
 import base64
 import random
 
-#LIMIT = 13407807929942597099574024998205846127479365820592393377723561443721764030073546976801874298166903427690031858186486050853753882811946569946433649006084095
-LIMIT = 115792089237316195423570985008687907853269984665640564039457584007913129639935
+LIMIT = 13407807929942597099574024998205846127479365820592393377723561443721764030073546976801874298166903427690031858186486050853753882811946569946433649006084095
 E = 65537
 
 class ExtendedMessage:
@@ -114,14 +113,14 @@ def cipherMessage(originalMessage : str, keySet : KeySet):
     encryptedInt = applyKey(messageInt, "private", keySet)
     print("Encrypted message int: ", encryptedInt)
     print("\nParsing to Base64...")
-    encryptedMessageB64 = base64.b64encode((encryptedInt).to_bytes(64))
+    encryptedMessageB64 = base64.b64encode((encryptedInt).to_bytes(128))
     print("\nCalculating digital signature...")
     messageHash = GetMessageHash(originalMessage)
     print("\nMessage hash: ", messageHash)
     digitalSignatureInt = int.from_bytes(messageHash)
     digitalSignatureInt = applyKey(int.from_bytes(messageHash), "private", keySet)
     print("DigSign int: ", digitalSignatureInt)
-    digitalSignatureB64 = base64.b64encode((digitalSignatureInt).to_bytes(64, "big"))
+    digitalSignatureB64 = base64.b64encode((digitalSignatureInt).to_bytes(128, "big"))
     print("DigSign B64: ", digitalSignatureB64)
     extMessageSent = ExtendedMessage(encryptedMessageB64, digitalSignatureB64)
     print("\n[SENT MESSAGE] Encrypted message (Base64): ", encryptedMessageB64)
@@ -139,7 +138,7 @@ def decipherMessage(extMessageRecieved : ExtendedMessage, keySet : KeySet):
     decryptedSignatureInt = int.from_bytes(base64.b64decode(extMessageRecieved.digitalSignature))
     print("DigSign int: ", decryptedSignatureInt)
     decryptedSignatureInt = applyKey(decryptedSignatureInt, "public", keySet)
-    decryptedMessage = MessageBytesToString((decryptedMessageInt).to_bytes(64, "big"))
+    decryptedMessage = MessageBytesToString((decryptedMessageInt).to_bytes(128, "big"))
     cleanedDecryptedMessage = decryptedMessage.strip('\x00')
     decryptedSignature = (decryptedSignatureInt).to_bytes(32, "big")
 
