@@ -8,7 +8,7 @@
 *.elf
 
 # Environment files
-Projeto-02/.venv/
+.venv/
 
 # Linker output
 *.ilk
