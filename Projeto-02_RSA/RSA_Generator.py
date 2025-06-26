@@ -17,19 +17,14 @@ class KeySet:
         self.privateKey = privateKey
 
 def GreatestCommonDivider(a, b):
-    """
-    Performs the Euclidean algorithm and returns the gcd of a and b
-    """
+    #Returns the gcd of a and b
     if (b == 0):
         return a
     else:
         return GreatestCommonDivider(b, a % b)
 
 def ExtendedGCD(a, b):
-    """
-    Performs the extended Euclidean algorithm
-    Returns the gcd, coefficient of a, and coefficient of b
-    """
+    #Returns the gcd, coefficient of a, and coefficient of b
     x, old_x = 0, 1
     y, old_y = 1, 0
 
@@ -50,7 +45,7 @@ def GenerateKeySet():
     print("n (p*q) = ", primesProduct)
     totient = (primeNo1 - 1) * (primeNo2 - 1)
     print("totient (p-1)*(q-1) = ", totient)
-    GreatestCommonDivider, tempD, y = ExtendedGCD(E, totient)
+    gcd, tempD, y = ExtendedGCD(E, totient)
     if (tempD < 0):
         d = tempD + totient
     else:
