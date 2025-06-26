@@ -7,9 +7,9 @@ LIMIT = 134078079299425970995740249982058461274793658205923933777235614437217640
 E = 65537
 
 class ExtendedMessage:
-    def __init__(self, encryptedMessage_, digitalSignature_):
+    def __init__(self, encryptedMessage_, encryptedHash_):
         self.encryptedMessage = encryptedMessage_
-        self.digitalSignature = digitalSignature_
+        self.encryptedHash = encryptedHash_
 
 class KeySet:
     def __init__(self, publicKey: tuple, privateKey: tuple):
@@ -40,14 +40,14 @@ def GenerateKeySet():
     print("Generating Key Set...")
     primeNo1 = randprime(1, LIMIT)
     primeNo2 = randprime(1, LIMIT)
-    print("Values chosen:\np = ", primeNo1 ,"\nq = ", primeNo2)
+    print("Values chosen:\n'p' = ", primeNo1 ,"\n'q' = ", primeNo2)
     primesProduct = primeNo1 * primeNo2
-    print("n (p*q) = ", primesProduct)
-    totient = (primeNo1 - 1) * (primeNo2 - 1)
-    print("totient (p-1)*(q-1) = ", totient)
-    gcd, tempD, y = ExtendedGCD(E, totient)
+    print("'n' (p*q) = ", primesProduct)
+    phi = (primeNo1 - 1) * (primeNo2 - 1)
+    print("phi (p-1)*(q-1) = ", phi)
+    gcd, tempD, y = ExtendedGCD(E, phi)
     if (tempD < 0):
-        d = tempD + totient
+        d = tempD + phi
     else:
         d = tempD
 
@@ -95,7 +95,9 @@ def GetMessageHash(plaintextMsg: str):
 
 def HashComparison(messageString : str, messageHash : bytes):
     hashCheckAttempt = GetMessageHash(messageString)
-    print("Decrypted message: ", messageString, "\n\nHash Attempt: ", hashCheckAttempt, "\nOriginal Hash: ", messageHash)
+    print("INTEGRITY CHECK: ", messageString,
+          "\n\nHash Attempt: ", hashCheckAttempt,
+          "\nRecieved Hash: ", messageHash)
     if(hashCheckAttempt == messageHash):
         return True
     else:
@@ -105,33 +107,32 @@ def cipherMessage(originalMessage : str, keySet : KeySet):
     print("Encrypting message...")
     messageInt = MessageBytesToInt(originalMessage.encode())
     print("\nMessage int: ", messageInt)
-    encryptedInt = applyKey(messageInt, "private", keySet)
-    print("Encrypted message int: ", encryptedInt)
+    encryptedMsgInt = applyKey(messageInt, "private", keySet)
+    print("Encrypted message int: ", encryptedMsgInt)
     print("\nParsing to Base64...")
-    encryptedMessageB64 = base64.b64encode((encryptedInt).to_bytes(128))
-    print("\nCalculating digital signature...")
+    encryptedMsgB64 = base64.b64encode((encryptedMsgInt).to_bytes(128))
+    print("\nCalculating hash...")
     messageHash = GetMessageHash(originalMessage)
     print("\nMessage hash: ", messageHash)
-    digitalSignatureInt = int.from_bytes(messageHash)
-    digitalSignatureInt = applyKey(int.from_bytes(messageHash), "private", keySet)
-    print("DigSign int: ", digitalSignatureInt)
-    digitalSignatureB64 = base64.b64encode((digitalSignatureInt).to_bytes(128, "big"))
-    print("DigSign B64: ", digitalSignatureB64)
-    extMessageSent = ExtendedMessage(encryptedMessageB64, digitalSignatureB64)
-    print("\n[SENT MESSAGE] Encrypted message (Base64): ", encryptedMessageB64)
-    print("[SENT MESSAGE] Digital signature (Base64): ", digitalSignatureB64)
-    return extMessageSent 
+    encgryptedHashInt = int.from_bytes(messageHash)
+    encgryptedHashInt = applyKey(int.from_bytes(messageHash), "private", keySet)
+    print("Encrypted Hash int: ", encgryptedHashInt)
+    encryptedHashB64 = base64.b64encode((encgryptedHashInt).to_bytes(128, "big"))
+    print("Encrypted Hash B64: ", encryptedHashB64)
+    digSignedMessage = ExtendedMessage(encryptedMsgB64, encryptedHashB64)
+    print("\n[SENT MESSAGE] Encrypted message (Base64): ", encryptedMsgB64)
+    print("[SENT MESSAGE] Encrypted hash (Base64): ", encryptedHashB64)
+    return digSignedMessage
 
 
 def decipherMessage(extMessageRecieved : ExtendedMessage, keySet : KeySet):
     # Convert both message and signature from Base64 to bytes
     print("\n[RECIEVED MESSAGE] Encrypted message (Base64): ", extMessageRecieved.encryptedMessage)
-    print("[RECIEVED MESSAGE] Digital signature (Base64): ", extMessageRecieved.digitalSignature)
+    print("[RECIEVED MESSAGE] Encrypted hash (Base64): ", extMessageRecieved.encryptedHash)
 
     print("\nConverting from Base64 and decrypting...")
     decryptedMessageInt = applyKey(int.from_bytes(base64.b64decode(extMessageRecieved.encryptedMessage)), "public", keySet)
-    decryptedSignatureInt = int.from_bytes(base64.b64decode(extMessageRecieved.digitalSignature))
-    print("DigSign int: ", decryptedSignatureInt)
+    decryptedSignatureInt = int.from_bytes(base64.b64decode(extMessageRecieved.encryptedHash))
     decryptedSignatureInt = applyKey(decryptedSignatureInt, "public", keySet)
     decryptedMessage = MessageBytesToString((decryptedMessageInt).to_bytes(128, "big"))
     cleanedDecryptedMessage = decryptedMessage.strip('\x00')
