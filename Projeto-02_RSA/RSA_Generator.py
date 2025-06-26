@@ -95,9 +95,8 @@ def GetMessageHash(plaintextMsg: str):
 
 def HashComparison(messageString : str, messageHash : bytes):
     hashCheckAttempt = GetMessageHash(messageString)
-    print("INTEGRITY CHECK: ", messageString,
-          "\n\nHash Attempt: ", hashCheckAttempt,
-          "\nRecieved Hash: ", messageHash)
+    print("\n[INTEGRITY CHECK]\nHash Attempt: ", hashCheckAttempt,
+          "\nRecieved Hash: ", messageHash, "\n\n")
     if(hashCheckAttempt == messageHash):
         return True
     else:
@@ -124,7 +123,6 @@ def cipherMessage(originalMessage : str, keySet : KeySet):
     print("[SENT MESSAGE] Encrypted hash (Base64): ", encryptedHashB64)
     return digSignedMessage
 
-
 def decipherMessage(extMessageRecieved : ExtendedMessage, keySet : KeySet):
     # Convert both message and signature from Base64 to bytes
     print("\n[RECIEVED MESSAGE] Encrypted message (Base64): ", extMessageRecieved.encryptedMessage)
@@ -132,23 +130,24 @@ def decipherMessage(extMessageRecieved : ExtendedMessage, keySet : KeySet):
 
     print("\nConverting from Base64 and decrypting...")
     decryptedMessageInt = applyKey(int.from_bytes(base64.b64decode(extMessageRecieved.encryptedMessage)), "public", keySet)
-    decryptedSignatureInt = int.from_bytes(base64.b64decode(extMessageRecieved.encryptedHash))
-    decryptedSignatureInt = applyKey(decryptedSignatureInt, "public", keySet)
+    decryptedHashInt = int.from_bytes(base64.b64decode(extMessageRecieved.encryptedHash))
+    decryptedHashInt = applyKey(decryptedHashInt, "public", keySet)
     decryptedMessage = MessageBytesToString((decryptedMessageInt).to_bytes(128, "big"))
     cleanedDecryptedMessage = decryptedMessage.strip('\x00')
-    decryptedSignature = (decryptedSignatureInt).to_bytes(32, "big")
+    decryptedHash = (decryptedHashInt).to_bytes(32, "big")
 
-    if(HashComparison(cleanedDecryptedMessage, decryptedSignature)):
+    if(HashComparison(cleanedDecryptedMessage, decryptedHash)):
         print("INTEGRITY CHECK: TRUE")
     else:
         print("INTEGRITY CHECK: FALSE")
-    return decryptedMessage
+    return cleanedDecryptedMessage
 
 usedKeyset = GenerateKeySet()
 
-originalMessage = "Message"
+originalMessage = "This is a message"
 print("Original message: ", originalMessage)
 
 extendedMessage = cipherMessage(originalMessage, usedKeyset)
 decipheredMessage = decipherMessage(extendedMessage, usedKeyset)
-print("Original message: ", decipheredMessage)
+print("Decrypted message: ", decipheredMessage)
+input()
