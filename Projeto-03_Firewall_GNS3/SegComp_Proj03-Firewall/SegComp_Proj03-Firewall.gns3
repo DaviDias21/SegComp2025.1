@@ -104,7 +104,7 @@
                 "rotation": 0,
                 "svg": "<svg width=\"250\" height=\"320\"><rect width=\"250\" height=\"320\" fill=\"#d3d3d3\" fill-opacity=\"1.0\" stroke-dasharray=\"25, 25\" stroke-width=\"2\" stroke=\"#000000\" /></svg>",
                 "x": -434,
-                "y": -189,
+                "y": -185,
                 "z": 0
             },
             {
@@ -504,7 +504,7 @@
                     "cpus": 1,
                     "create_config_disk": false,
                     "hda_disk_image": "chr-7.12.1.img",
-                    "hda_disk_image_md5sum": "17cd655cf264c4baa9cbaf7c2f8595a9",
+                    "hda_disk_image_md5sum": "a07f5478d7700b27391f850da9748b3d",
                     "hda_disk_interface": "virtio",
                     "hdb_disk_image": "",
                     "hdb_disk_image_md5sum": null,
@@ -534,7 +534,7 @@
                     "uefi": false,
                     "usage": "If you'd like a different sized main disk, resize the image before booting the VM for the first time.\n\nOn first boot, RouterOS is actually being installed, formatting the whole main virtual disk, before finally rebooting. That whole process may take a minute or so.\n\nThe console will become available after the installation is complete. Most Telnet/SSH clients (certainly SuperPutty) will keep retrying to connect, thus letting you know when installation is done.\n\nFrom that point on, everything about RouterOS is also true about Cloud Hosted Router, including the default credentials: Username \"admin\" and an empty password.\n\nThe primary differences between RouterOS and CHR are in support for virtual devices (this appliance comes with them being selected), and in the different license model, for which you can read more about at http://wiki.mikrotik.com/wiki/Manual:CHR."
                 },
-                "symbol": ":/symbols/classic/router.svg",
+                "symbol": ":/symbols/classic/router_firewall.svg",
                 "template_id": "6acc2c49-9448-4579-b111-3be2566fbec5",
                 "width": 66,
                 "x": -58,
@@ -574,7 +574,7 @@
                     "cpus": 1,
                     "create_config_disk": false,
                     "hda_disk_image": "chr-7.12.1.img",
-                    "hda_disk_image_md5sum": "17cd655cf264c4baa9cbaf7c2f8595a9",
+                    "hda_disk_image_md5sum": "a07f5478d7700b27391f850da9748b3d",
                     "hda_disk_interface": "virtio",
                     "hdb_disk_image": "",
                     "hdb_disk_image_md5sum": null,
@@ -964,7 +964,7 @@
                     "cpus": 1,
                     "create_config_disk": false,
                     "hda_disk_image": "chr-7.12.1.img",
-                    "hda_disk_image_md5sum": "17cd655cf264c4baa9cbaf7c2f8595a9",
+                    "hda_disk_image_md5sum": "a07f5478d7700b27391f850da9748b3d",
                     "hda_disk_interface": "virtio",
                     "hdb_disk_image": "",
                     "hdb_disk_image_md5sum": null,
@@ -1034,7 +1034,7 @@
                     "cpus": 1,
                     "create_config_disk": false,
                     "hda_disk_image": "chr-7.12.1.img",
-                    "hda_disk_image_md5sum": "17cd655cf264c4baa9cbaf7c2f8595a9",
+                    "hda_disk_image_md5sum": "a07f5478d7700b27391f850da9748b3d",
                     "hda_disk_interface": "virtio",
                     "hdb_disk_image": "",
                     "hdb_disk_image_md5sum": null,
@@ -1098,7 +1098,7 @@
                     "console_http_path": "/",
                     "console_http_port": 80,
                     "console_resolution": "1024x768",
-                    "container_id": "8fd55f87dd9c33f248be4bc363aa674ecafc9697ac5630279042cbf131d2e37b",
+                    "container_id": "0d77aa52b09f4d521bfb2f815111e8b95186548da05fc4ec26f53784ffbb428e",
                     "environment": "",
                     "extra_hosts": "",
                     "extra_volumes": [],
@@ -1141,7 +1141,7 @@
                     "console_http_path": "/",
                     "console_http_port": 80,
                     "console_resolution": "1024x768",
-                    "container_id": "8b78345549fb9597f5c97e2a6819972bb51f1e35f09de7d40f5ed8533f3e39ff",
+                    "container_id": "cfecaa4f5f07659f35d3b596e79af4e3de62c4e7680c0ac9c32badf885bcbb69",
                     "environment": "",
                     "extra_hosts": "",
                     "extra_volumes": [],
@@ -1162,5 +1162,5 @@
     "type": "topology",
     "variables": null,
     "version": "2.2.54",
-    "zoom": 100
+    "zoom": 83
 }
