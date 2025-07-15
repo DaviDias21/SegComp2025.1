@@ -10,7 +10,7 @@
     "scene_height": 1000,
     "scene_width": 2000,
     "show_grid": false,
-    "show_interface_labels": false,
+    "show_interface_labels": true,
     "show_layers": false,
     "snap_to_grid": false,
     "supplier": null,
@@ -277,8 +277,8 @@
                             "rotation": 0,
                             "style": "font-family: TypeWriter;font-size: 10.0;font-weight: bold;fill: #000000;fill-opacity: 1.0;",
                             "text": "Ether1",
-                            "x": 33,
-                            "y": -18
+                            "x": -22,
+                            "y": -30
                         },
                         "node_id": "3499f533-a3ae-4581-915f-2efe4ece0486",
                         "port_number": 0
@@ -560,7 +560,7 @@
                     "uefi": false,
                     "usage": ""
                 },
-                "symbol": ":/symbols/classic/router_firewall.svg",
+                "symbol": ":/symbols/classic/router.svg",
                 "template_id": "278dd412-2cab-4248-a3cd-283569b466ee",
                 "width": 66,
                 "x": -55,
@@ -1057,7 +1057,7 @@
                 "symbol": ":/symbols/classic/server.svg",
                 "template_id": "278dd412-2cab-4248-a3cd-283569b466ee",
                 "width": 49,
-                "x": -439,
+                "x": -432,
                 "y": 6,
                 "z": 1
             },
@@ -1145,7 +1145,7 @@
                 "template_id": "278dd412-2cab-4248-a3cd-283569b466ee",
                 "width": 49,
                 "x": 320,
-                "y": -1,
+                "y": 0,
                 "z": 1
             },
             {
@@ -1175,7 +1175,7 @@
                     "console_http_path": "/",
                     "console_http_port": 80,
                     "console_resolution": "1024x768",
-                    "container_id": "99cf55e31dc9148a84247e860e0a54f701add851f06c6f63a1e64c38aa785bbd",
+                    "container_id": "f2cda522afeeeebaf792b2a840492d1c539a31ee1d44f1df593f758c42473e74",
                     "environment": "",
                     "extra_hosts": "",
                     "extra_volumes": [],
@@ -1218,7 +1218,7 @@
                     "console_http_path": "/",
                     "console_http_port": 80,
                     "console_resolution": "1024x768",
-                    "container_id": "c2e2412d18f1fab1ff0df4c619221a38f43949a529c27e5d59066b463a216720",
+                    "container_id": "28e60e08734f7a638e6b6ae341a6eb30ada9a01868623ec4b687022d1f9a45e2",
                     "environment": "",
                     "extra_hosts": "",
                     "extra_volumes": [],
@@ -1239,5 +1239,5 @@
     "type": "topology",
     "variables": null,
     "version": "2.2.54",
-    "zoom": 141
+    "zoom": 100
 }
